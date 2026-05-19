@@ -59,6 +59,27 @@ src/
 - `npm run dev` — Inicia servidor de desarrollo
 - `npm run build` — Construye para producción
 - `npm run preview` — Vista previa de build
+- `npm test` — Ejecuta suite de tests
+
+### Testing
+
+El proyecto incluye una suite completa de tests unitarios usando **Vitest**:
+
+```bash
+npm test
+```
+
+**Coverage:**
+- Tests para `RedactionLayer` — Gestión de redacciones, undo/redo, tipos
+- Tests para `drawRedactionShape` — Renderizado de caja, tachar, resaltado
+- Tests para diferentes tipos de redacción — box, strike, highlight
+- 17 tests que verifican funcionalidad crítica
+
+Todos los tests deben pasar antes de hacer commit:
+
+```bash
+npm test -- --reporter=verbose
+```
 
 ### Contribuciones
 
