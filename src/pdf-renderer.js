@@ -86,6 +86,10 @@ export function drawRedactionShape(ctx, r, alpha = 1, scaleFactor = 1) {
     ctx.moveTo(x, y + h / 2)
     ctx.lineTo(x + w, y + h / 2)
     ctx.stroke()
+  } else if (r.type === 'highlight') {
+    ctx.fillStyle = '#FFFF00'
+    ctx.globalAlpha = alpha * 0.4
+    ctx.fillRect(x, y, w, h)
   }
   ctx.restore()
 }

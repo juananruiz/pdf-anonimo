@@ -23,6 +23,7 @@ const btnMetadata   = document.getElementById('btn-metadata')
 const btnClearMeta  = document.getElementById('btn-clear-meta')
 const toolBox       = document.getElementById('tool-box')
 const toolStrike    = document.getElementById('tool-strike')
+const toolHighlight = document.getElementById('tool-highlight')
 const docList       = document.getElementById('doc-list')
 
 // ── Estado ──
@@ -135,11 +136,13 @@ async function goToPage(pageNum) {
 // ── Herramientas ──
 toolBox.addEventListener('click', () => setTool('box'))
 toolStrike.addEventListener('click', () => setTool('strike'))
+toolHighlight.addEventListener('click', () => setTool('highlight'))
 
 function setTool(tool) {
   docManager.getActive()?.redactionLayer.setTool(tool)
   toolBox.classList.toggle('active', tool === 'box')
   toolStrike.classList.toggle('active', tool === 'strike')
+  toolHighlight.classList.toggle('active', tool === 'highlight')
 }
 
 function updateUndoState() {

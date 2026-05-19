@@ -49,6 +49,8 @@ src/
 2. Carga un PDF
 3. Selecciona áreas a redactar
 4. Descarga el documento anonimizado
+5. Dale una estrella al producto si te resulta útil
+6. Para reportar bugs o sugerencias, abre un [issue en GitHub](https://github.com/juananruiz/pdf-anonimo/issues).
 
 ## Desarrollo
 
@@ -68,14 +70,20 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
+## Autor
+
+**Juan Antonio Ruiz** — [@juananruiz](https://github.com/juananruiz)
+
 ## Licencia
 
 Este proyecto está bajo licencia MIT.
 
-## Autor
+## Referencias
 
-**Juan Andrés Ruiz** — [@juananruiz](https://github.com/juananruiz)
+### Proyectos similares
+
+- https://github.com/jjdeharo/anonim-pdf
+- https://github.com/Mauricio333bit/anonimizadorPDF/
 
 ---
 
-Para reportar bugs o sugerencias, abre un [issue en GitHub](https://github.com/juananruiz/pdf-anonimo/issues).
