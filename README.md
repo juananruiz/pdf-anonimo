@@ -56,10 +56,27 @@ src/
 
 ### Scripts disponibles
 
-- `npm run dev` — Inicia servidor de desarrollo
-- `npm run build` — Construye para producción
+- `npm run dev` — Inicia servidor de desarrollo (web)
+- `npm run build` — Construye para producción (web)
 - `npm run preview` — Vista previa de build
 - `npm test` — Ejecuta suite de tests
+- `npm run electron:dev` — Abre la app como ventana de escritorio (modo dev)
+- `npm run electron:build` — Genera ejecutable/instalador en `dist-electron/`
+
+### App de escritorio (Electron)
+
+Para usar la app como aplicación nativa de escritorio:
+
+```bash
+# Desarrollo (hot reload)
+npm run electron:dev
+
+# Generar ejecutable
+npm run electron:build
+# → dist-electron/PDF Anónimo-1.0.0.dmg  (macOS)
+# → dist-electron/PDF Anónimo Setup.exe   (Windows)
+# → dist-electron/PDF Anónimo.AppImage   (Linux)
+```
 
 ### Testing
 

@@ -6,6 +6,7 @@ yarn.lock
 # Build output
 dist/
 build/
+dist-electron/
 .env.local
 .env.*.local
 
