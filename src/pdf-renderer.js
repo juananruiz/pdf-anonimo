@@ -62,19 +62,42 @@ export async function renderPageOffscreen(pageNum, redactions, scale = EXPORT_SC
   await page.render({ canvasContext: ctx, viewport }).promise
 
   const pageRedactions = redactions.get(pageNum) || []
-  pageRedactions.forEach(r => drawRedactionShape(ctx, r, 1, scale / DEFAULT_SCALE))
+  pageRedactions.forEach(r => drawRedactionShape(ctx, r, 1, scale / DEFAULT_SCALE, offscreenCanvas))
 
   const blob = await new Promise(resolve => offscreenCanvas.toBlob(resolve, 'image/png'))
   return { blob, width: viewport.width, height: viewport.height }
 }
 
-export function drawRedactionShape(ctx, r, alpha = 1, scaleFactor = 1) {
+function pixelateRegion(ctx, sourceCanvas, x, y, w, h) {
+  const blockSize = 10
+  const cols = Math.max(1, Math.ceil(w / blockSize))
+  const rows = Math.max(1, Math.ceil(h / blockSize))
+  const tmp = document.createElement('canvas')
+  tmp.width = cols
+  tmp.height = rows
+  const tmpCtx = tmp.getContext('2d')
+  tmpCtx.imageSmoothingEnabled = false
+  tmpCtx.drawImage(sourceCanvas, x, y, w, h, 0, 0, cols, rows)
   ctx.save()
-  ctx.globalAlpha = alpha
+  ctx.globalAlpha = 1
+  ctx.imageSmoothingEnabled = false
+  ctx.drawImage(tmp, 0, 0, cols, rows, x, y, w, h)
+  ctx.restore()
+}
+
+export function drawRedactionShape(ctx, r, alpha = 1, scaleFactor = 1, pdfCanvas = null) {
   const x = r.x * scaleFactor
   const y = r.y * scaleFactor
   const w = r.w * scaleFactor
   const h = r.h * scaleFactor
+
+  if (r.type === 'smear') {
+    pixelateRegion(ctx, pdfCanvas || ctx.canvas, x, y, w, h)
+    return
+  }
+
+  ctx.save()
+  ctx.globalAlpha = alpha
   if (r.type === 'box') {
     ctx.fillStyle = '#000000'
     ctx.fillRect(x, y, w, h)

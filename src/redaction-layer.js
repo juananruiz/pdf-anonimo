@@ -65,7 +65,8 @@ export class RedactionLayer {
 
   redraw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    this.getPageRedactions().forEach(r => drawRedactionShape(this.ctx, r))
+    const pdfCanvas = document.getElementById('pdf-canvas')
+    this.getPageRedactions().forEach(r => drawRedactionShape(this.ctx, r, 1, 1, pdfCanvas))
   }
 
   destroy() {
@@ -115,7 +116,10 @@ export class RedactionLayer {
     requestAnimationFrame(() => {
       this._rafPending = false
       this.redraw()
-      if (this.currentRect) drawRedactionShape(this.ctx, { type: this.activeTool, ...this.currentRect }, 0.7)
+      if (this.currentRect) {
+        const pdfCanvas = document.getElementById('pdf-canvas')
+        drawRedactionShape(this.ctx, { type: this.activeTool, ...this.currentRect }, 0.7, 1, pdfCanvas)
+      }
     })
   }
 

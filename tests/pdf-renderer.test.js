@@ -105,6 +105,30 @@ describe('drawRedactionShape', () => {
     expect(capturedGlobalAlpha).toBeCloseTo(alpha * 0.4, 5)
   })
 
+  it('debería pixelar región para tipo "smear" usando pdfCanvas', () => {
+    const pdfCanvas = document.createElement('canvas')
+    pdfCanvas.width = 800
+    pdfCanvas.height = 600
+    const pdfCtx = pdfCanvas.getContext('2d')
+    pdfCtx.fillStyle = '#ff0000'
+    pdfCtx.fillRect(0, 0, 800, 600)
+
+    const redaction = { type: 'smear', x: 10, y: 10, w: 100, h: 50 }
+
+    let drawImageCalled = false
+    const originalDrawImage = ctx.drawImage
+    ctx.drawImage = function(...args) {
+      drawImageCalled = true
+      return originalDrawImage.apply(this, args)
+    }
+
+    drawRedactionShape(ctx, redaction, 1, 1, pdfCanvas)
+
+    expect(drawImageCalled).toBe(true)
+    const pixel = ctx.getImageData(50, 30, 1, 1).data
+    expect(pixel[0]).toBeGreaterThan(0)
+  })
+
   it('debería aplicar scaleFactor a coordenadas', () => {
     const redaction = { type: 'box', x: 10, y: 10, w: 100, h: 50 }
     const scaleFactor = 2
