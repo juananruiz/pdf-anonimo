@@ -9,6 +9,11 @@ Aplicación web para anonimizar documentos PDF mediante redacción interactiva.
 - 🎨 **Editor Visual** — Interfaz intuitiva para gestionar redacciones
 - 💾 **Exportación** — Descarga el PDF anonimizado
 - 📋 **Gestor de Documentos** — Maneja metadatos y propiedades
+- 🔎 **OCR (scanned PDFs)** — Reconocimiento de texto en PDFs escaneados (Tesseract.js) para poder redactar texto que está dentro de imágenes
+
+## Captura de pantalla
+
+![Captura de pantalla de PDF Anónimo](assets/screenshot.svg)
 
 ## Instalación
 
@@ -47,10 +52,11 @@ src/
 
 1. Abre la aplicación en tu navegador
 2. Carga un PDF
-3. Selecciona áreas a redactar
-4. Descarga el documento anonimizado
-5. Dale una estrella al producto si te resulta útil
-6. Para reportar bugs o sugerencias, abre un [issue en GitHub](https://github.com/juananruiz/pdf-anonimo/issues).
+3. Si el PDF está escaneado (texto como imagen), usa el botón "Detectar texto (OCR)" en la barra de herramientas para ejecutar OCR en la página actual. El sistema propondrá redacciones automáticas para coincidencias de PII (correo, teléfono, NIF, IBAN), que podrás aceptar o descartar.
+4. Selecciona manualmente áreas adicionales a redactar
+5. Descarga el documento anonimizado
+6. Dale una estrella al producto si te resulta útil
+7. Para reportar bugs o sugerencias, abre un [issue en GitHub](https://github.com/juananruiz/pdf-anonimo/issues).
 
 ## Desarrollo
 

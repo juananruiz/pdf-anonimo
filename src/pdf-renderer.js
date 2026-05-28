@@ -1,122 +1,147 @@
-import * as pdfjsLib from 'pdfjs-dist'
+import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url
-).href
+	"pdfjs-dist/build/pdf.worker.mjs",
+	import.meta.url,
+).href;
 
-export const DEFAULT_SCALE = 1.5
-export const EXPORT_SCALE = 2.5
+export const DEFAULT_SCALE = 1.5;
+export const EXPORT_SCALE = 2.5;
 
-let pdfDocument = null
-let offscreenCanvas = null
+let pdfDocument = null;
+let offscreenCanvas = null;
 
 export async function loadPDFDoc(arrayBuffer) {
-  return pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise
+	return pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
 }
 
 export function setActiveDocument(doc) {
-  pdfDocument = doc
+	pdfDocument = doc;
 }
 
 export async function getDocumentMetadata() {
-  if (!pdfDocument) return {}
-  const { info } = await pdfDocument.getMetadata()
-  return {
-    title:    info.Title    || '',
-    author:   info.Author   || '',
-    subject:  info.Subject  || '',
-    keywords: info.Keywords || '',
-    creator:  info.Creator  || '',
-    producer: info.Producer || '',
-    creationDate:     info.CreationDate     || '',
-    modificationDate: info.ModDate || '',
-  }
+	if (!pdfDocument) return {};
+	const { info } = await pdfDocument.getMetadata();
+	return {
+		title: info.Title || "",
+		author: info.Author || "",
+		subject: info.Subject || "",
+		keywords: info.Keywords || "",
+		creator: info.Creator || "",
+		producer: info.Producer || "",
+		creationDate: info.CreationDate || "",
+		modificationDate: info.ModDate || "",
+	};
 }
 
 async function getPageViewport(pageNum, scale) {
-  const page = await pdfDocument.getPage(pageNum)
-  const viewport = page.getViewport({ scale })
-  return { page, viewport }
+	const page = await pdfDocument.getPage(pageNum);
+	const viewport = page.getViewport({ scale });
+	return { page, viewport };
 }
 
 export async function renderPage(pageNum, canvas, scale = DEFAULT_SCALE) {
-  if (!pdfDocument) throw new Error('No hay documento cargado')
-  const { page, viewport } = await getPageViewport(pageNum, scale)
-  canvas.width = viewport.width
-  canvas.height = viewport.height
-  const ctx = canvas.getContext('2d')
-  await page.render({ canvasContext: ctx, viewport }).promise
-  return { width: viewport.width, height: viewport.height }
+	if (!pdfDocument) throw new Error("No hay documento cargado");
+	const { page, viewport } = await getPageViewport(pageNum, scale);
+	canvas.width = viewport.width;
+	canvas.height = viewport.height;
+	const ctx = canvas.getContext("2d");
+	await page.render({ canvasContext: ctx, viewport }).promise;
+	return { width: viewport.width, height: viewport.height };
 }
 
-export async function renderPageOffscreen(pageNum, redactions, scale = EXPORT_SCALE) {
-  if (!pdfDocument) throw new Error('No hay documento cargado')
-  const { page, viewport } = await getPageViewport(pageNum, scale)
+export async function renderPageToCanvas(pageNum, scale = DEFAULT_SCALE) {
+	if (!pdfDocument) throw new Error("No hay documento cargado");
+	const { page, viewport } = await getPageViewport(pageNum, scale);
+	const canvas = document.createElement("canvas");
+	canvas.width = viewport.width;
+	canvas.height = viewport.height;
+	const ctx = canvas.getContext("2d");
+	await page.render({ canvasContext: ctx, viewport }).promise;
+	return { canvas, width: viewport.width, height: viewport.height };
+}
 
-  if (!offscreenCanvas) offscreenCanvas = document.createElement('canvas')
-  offscreenCanvas.width = viewport.width
-  offscreenCanvas.height = viewport.height
+export async function renderPageOffscreen(
+	pageNum,
+	redactions,
+	scale = EXPORT_SCALE,
+) {
+	if (!pdfDocument) throw new Error("No hay documento cargado");
+	const { page, viewport } = await getPageViewport(pageNum, scale);
 
-  const ctx = offscreenCanvas.getContext('2d')
-  await page.render({ canvasContext: ctx, viewport }).promise
+	if (!offscreenCanvas) offscreenCanvas = document.createElement("canvas");
+	offscreenCanvas.width = viewport.width;
+	offscreenCanvas.height = viewport.height;
 
-  const pageRedactions = redactions.get(pageNum) || []
-  pageRedactions.forEach(r => drawRedactionShape(ctx, r, 1, scale / DEFAULT_SCALE, offscreenCanvas))
+	const ctx = offscreenCanvas.getContext("2d");
+	await page.render({ canvasContext: ctx, viewport }).promise;
 
-  const blob = await new Promise(resolve => offscreenCanvas.toBlob(resolve, 'image/png'))
-  return { blob, width: viewport.width, height: viewport.height }
+	const pageRedactions = redactions.get(pageNum) || [];
+	pageRedactions.forEach((r) =>
+		drawRedactionShape(ctx, r, 1, scale / DEFAULT_SCALE, offscreenCanvas),
+	);
+
+	const blob = await new Promise((resolve) =>
+		offscreenCanvas.toBlob(resolve, "image/png"),
+	);
+	return { blob, width: viewport.width, height: viewport.height };
 }
 
 function pixelateRegion(ctx, sourceCanvas, x, y, w, h) {
-  const blockSize = 10
-  const cols = Math.max(1, Math.ceil(w / blockSize))
-  const rows = Math.max(1, Math.ceil(h / blockSize))
-  const tmp = document.createElement('canvas')
-  tmp.width = cols
-  tmp.height = rows
-  const tmpCtx = tmp.getContext('2d')
-  tmpCtx.imageSmoothingEnabled = false
-  tmpCtx.drawImage(sourceCanvas, x, y, w, h, 0, 0, cols, rows)
-  ctx.save()
-  ctx.globalAlpha = 1
-  ctx.imageSmoothingEnabled = false
-  ctx.drawImage(tmp, 0, 0, cols, rows, x, y, w, h)
-  ctx.restore()
+	const blockSize = 10;
+	const cols = Math.max(1, Math.ceil(w / blockSize));
+	const rows = Math.max(1, Math.ceil(h / blockSize));
+	const tmp = document.createElement("canvas");
+	tmp.width = cols;
+	tmp.height = rows;
+	const tmpCtx = tmp.getContext("2d");
+	tmpCtx.imageSmoothingEnabled = false;
+	tmpCtx.drawImage(sourceCanvas, x, y, w, h, 0, 0, cols, rows);
+	ctx.save();
+	ctx.globalAlpha = 1;
+	ctx.imageSmoothingEnabled = false;
+	ctx.drawImage(tmp, 0, 0, cols, rows, x, y, w, h);
+	ctx.restore();
 }
 
-export function drawRedactionShape(ctx, r, alpha = 1, scaleFactor = 1, pdfCanvas = null) {
-  const x = r.x * scaleFactor
-  const y = r.y * scaleFactor
-  const w = r.w * scaleFactor
-  const h = r.h * scaleFactor
+export function drawRedactionShape(
+	ctx,
+	r,
+	alpha = 1,
+	scaleFactor = 1,
+	pdfCanvas = null,
+) {
+	const x = r.x * scaleFactor;
+	const y = r.y * scaleFactor;
+	const w = r.w * scaleFactor;
+	const h = r.h * scaleFactor;
 
-  if (r.type === 'smear') {
-    pixelateRegion(ctx, pdfCanvas || ctx.canvas, x, y, w, h)
-    return
-  }
+	if (r.type === "smear") {
+		pixelateRegion(ctx, pdfCanvas || ctx.canvas, x, y, w, h);
+		return;
+	}
 
-  ctx.save()
-  ctx.globalAlpha = alpha
-  if (r.type === 'box') {
-    ctx.fillStyle = '#000000'
-    ctx.fillRect(x, y, w, h)
-  } else if (r.type === 'strike') {
-    ctx.strokeStyle = '#cc0000'
-    ctx.lineWidth = Math.max(h, 3)
-    ctx.lineCap = 'round'
-    ctx.beginPath()
-    ctx.moveTo(x, y + h / 2)
-    ctx.lineTo(x + w, y + h / 2)
-    ctx.stroke()
-  } else if (r.type === 'highlight') {
-    ctx.fillStyle = '#FFFF00'
-    ctx.globalAlpha = alpha * 0.4
-    ctx.fillRect(x, y, w, h)
-  }
-  ctx.restore()
+	ctx.save();
+	ctx.globalAlpha = alpha;
+	if (r.type === "box") {
+		ctx.fillStyle = "#000000";
+		ctx.fillRect(x, y, w, h);
+	} else if (r.type === "strike") {
+		ctx.strokeStyle = "#cc0000";
+		ctx.lineWidth = Math.max(h, 3);
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.moveTo(x, y + h / 2);
+		ctx.lineTo(x + w, y + h / 2);
+		ctx.stroke();
+	} else if (r.type === "highlight") {
+		ctx.fillStyle = "#FFFF00";
+		ctx.globalAlpha = alpha * 0.4;
+		ctx.fillRect(x, y, w, h);
+	}
+	ctx.restore();
 }
 
 export function getTotalPages() {
-  return pdfDocument ? pdfDocument.numPages : 0
+	return pdfDocument ? pdfDocument.numPages : 0;
 }
