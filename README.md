@@ -13,7 +13,7 @@ Aplicación web para anonimizar documentos PDF mediante redacción interactiva.
 
 ## Captura de pantalla
 
-![Captura de pantalla de PDF Anónimo](assets/screenshot.svg)
+![Captura de pantalla de PDF Anónimo](assets/screenshot.png)
 
 ## Instalación
 
@@ -130,4 +130,3 @@ Este proyecto está bajo licencia MIT.
 - https://github.com/Mauricio333bit/anonimizadorPDF/
 
 ---
-
